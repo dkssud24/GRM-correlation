@@ -188,6 +188,25 @@ grm_offdiag_cor_sampled <- function(prefix1,
   list(n = n, sampled_offdiag = length(x), correlation = if (length(x) > 1) cor(x, y) else NA_real_)
 }
 
+
+fisher_ci_p <- function(r, m, conf = 0.95) {
+  if (!is.finite(r) || m <= 3) return(list(se = NA_real_, lwr = NA_real_, upr = NA_real_, p = NA_real_))
+  z <- atanh(r)
+  se.z <- 1 / sqrt(m - 3)
+  alpha <- 1 - conf
+  z.l <- z - qnorm(1 - alpha/2) * se.z
+  z.u <- z + qnorm(1 - alpha/2) * se.z
+  ci <- tanh(c(z.l, z.u))
+  # p-value for H0: rho=0 (equivalently t-test)
+  tval <- r * sqrt((m - 2) / (1 - r^2))
+  pval <- 2 * pt(-abs(tval), df = m - 2)
+  list(se = se.z * (1 - r^2),   # delta method on r (optional; often report SE on z-scale)
+       se_z = se.z,             # SE on z-scale(권장 표기)
+       lwr = ci[1], upr = ci[2],
+       p = pval)
+}
+
+      
 ## ========== 사용 예시 ==========
 ## 0) self-check (같은 파일로 비교: corr ≈ 1)
 ## grm_offdiag_cor("v6.ABC.RARE.Aset", endian = "little")
@@ -197,3 +216,9 @@ grm_offdiag_cor_sampled <- function(prefix1,
 
 ## 2) 빠른 미리보기(샘플링)
 ## grm_offdiag_cor_sampled("v6.ABC.RARE.Aset", "v6.ABC.COMMON.Aset", K = 2e6, endian = "little")
+
+#res <- grm_offdiag_cor("v6.ABC.RARE.Aset", "v6.ABC.COMMON.Aset", endian="little")
+#m <- res$offdiag_pairs
+#r <- res$correlation
+#out <- fisher_ci_p(r, m)
+#out

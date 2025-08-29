@@ -106,7 +106,7 @@ grm_R2 <- function(prefix_common,
 
 R2_005 <- grm_R2(
   "/data/BiO/hae/WGS_rev/0_common/v2.common.grm",
-  "/data/BiO/hae/WGS_rev/Z_LD005/v4.grm.LD005",
+  "/data/BiO/hae/WGS_rev/Z_LD005/v6.ABC.RARE.Aset",
   K = 5e5, seed = 42, endian = "little"
 )
 
